@@ -1,0 +1,121 @@
+/* public/style.css */
+
+/* VARIÁVEIS DE CORES */
+:root {
+    --primary-color: #D32F2F;
+    /* Vermelho Pizza */
+    --secondary-color: #FFC107;
+    /* Amarelo Queijo/Ouro */
+    --background-color: #F5F5F5;
+    /* Cinza claro */
+    --text-color: #333;
+    --success-color: #4CAF50;
+    --error-color: #F44336;
+    --border-radius: 8px;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2em;
+}
+
+main {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+/* ESTILOS DE FORMULÁRIO/CONTROLES */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="tel"],
+input[type="date"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: var(--border-radius);
+    box-sizing: border-box;
+    /* Garante que o padding não aumente a largura total */
+    font-size: 1em;
+}
+
+button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+}
+
+button:hover:not(:disabled) {
+    background-color: #B71C1C;
+    /* Vermelho mais escuro */
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* MENSAGENS DE FEEDBACK */
+#feedbackMessage {
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    font-weight: bold;
+    color: white;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Responsividade Básica */
+@media (max-width: 600px) {
+    main {
+        margin: 20px;
+        padding: 15px;
+    }
+
+    header h1 {
+        font-size: 1.5em;
+    }
+}

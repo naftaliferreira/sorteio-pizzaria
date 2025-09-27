@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1758953240144,
+    "nome": "julio cesar",
+    "telefone": "31991221122",
+    "dataNascimento": "1990-02-01",
+    "dataRegistro": "2025-09-27T06:07:20.144Z"
+  },
+  {
+    "id": 1758954362646,
+    "nome": "maria julia",
+    "telefone": "31987154022",
+    "dataNascimento": "1989-08-12",
+    "dataRegistro": "2025-09-27T06:26:02.646Z"
+  },
+  {
+    "id": 1758955059342,
+    "nome": "luiz inacio",
+    "telefone": "21988712022",
+    "dataNascimento": "1945-06-19",
+    "dataRegistro": "2025-09-27T06:37:39.342Z"
+  },
+  {
+    "id": 1758955862746,
+    "nome": "carol dias",
+    "telefone": "11971142214",
+    "dataNascimento": "2005-01-22",
+    "dataRegistro": "2025-09-27T06:51:02.746Z"
+  }
+]

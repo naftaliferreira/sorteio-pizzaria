@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado do Sorteio! 🏆</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Estilos específicos para a página do vencedor */
+        #resultado {
+            text-align: center;
+            padding: 40px;
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            margin-top: 30px;
+        }
+
+        .status-message {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .winner-name {
+            font-size: 3em;
+            color: var(--success-color);
+            margin: 15px 0;
+            text-transform: uppercase;
+        }
+
+        .fireworks {
+            font-size: 4em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Resultado do Grande Sorteio da Pizzaria!</h1>
+    </header>
+
+    <main>
+        <div id="resultado">
+            <p class="status-message" id="status">Carregando resultado...</p>
+        </div>
+    </main>
+
+    <script src="vencedor.js"></script>
+</body>
+
+</html>

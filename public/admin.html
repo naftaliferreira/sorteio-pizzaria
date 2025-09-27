@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gerenciamento de Sorteio</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Estilos simples para a tabela */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        #leadsTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        #leadsTable th,
+        #leadsTable td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        #leadsTable th {
+            background-color: #f2f2f2;
+        }
+
+        .total-counter {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Painel de Administração - Leads do Sorteio</h1>
+    <p class="total-counter">Total de Participantes: <span id="leadCount">...</span></p>
+
+    <table id="leadsTable">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Data Nasc.</th>
+                <th>Registro</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>
