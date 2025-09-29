@@ -3,23 +3,31 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const bcrypt = require('bcrypt'); // NOVIDADE: Criptografia de senha
-const jwt = require('jsonwebtoken'); // NOVIDADE: Geração de Token
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const db = require('./db');
+const dotenv = require('dotenv'); // NOVIDADE: Importa dotenv
+
+// Configura o dotenv para carregar as variáveis do arquivo .env
+dotenv.config();
 
 const app = express();
 const PORT = 3000;
 
 // -------------------------------------------------------------------
-// VARIÁVEIS DE SEGURANÇA (Mudar para Variáveis de Ambiente!)
+// VARIÁVEIS DE SEGURANÇA (CARREGADAS DO .ENV)
 // -------------------------------------------------------------------
 
-const JWT_SECRET = 'sua_chave_secreta_muito_longa_e_aleatoria';
+// As credenciais são carregadas do processo, não estão mais hardcoded
+const JWT_SECRET = process.env.JWT_SECRET;
+const ADMIN_USER = process.env.ADMIN_USER;
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
 
-const ADMIN_USER = 'admin';
-// NOVO HASH CORRIGIDO para a senha 'admin123'
-const ADMIN_PASSWORD_HASH = '$2b$10$YnHU12jHbLBvbYJfe6RtTuDrSAydO3w9GVlrEgwYlc/6wHzeRytR2';
-// OBS: Você deve usar a senha 'admin123' no formulário.
+// Verificação de segurança: O servidor deve falhar se as chaves estiverem faltando.
+if (!JWT_SECRET || !ADMIN_PASSWORD_HASH || !ADMIN_USER) {
+    console.error("ERRO CRÍTICO: Variáveis de segurança (JWT_SECRET, ADMIN_USER, ADMIN_PASSWORD_HASH) não foram carregadas do arquivo .env. Verifique o arquivo e a instalação do dotenv.");
+    process.exit(1);
+}
 
 // Middleware para processar dados JSON
 app.use(bodyParser.json());
@@ -36,22 +44,21 @@ let winner = db.loadWinner();
 console.log(`Servidor iniciado. ${leads.length} leads carregados. ${winner ? 'Vencedor carregado.' : 'Sorteio pendente.'}`);
 
 // -------------------------------------------------------------------
-// Middleware de Autenticação (AGORA VERIFICA JWT)
+// Middleware de Autenticação (VERIFICA JWT)
 // -------------------------------------------------------------------
 const authenticateAdmin = (req, res, next) => {
-    // 1. Pega o token do cabeçalho de Autorização (Bearer Token)
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({ success: false, message: 'Acesso negado. Token não fornecido.' });
     }
 
-    const token = authHeader.split(' ')[1]; // Pega apenas o token
+    const token = authHeader.split(' ')[1];
 
-    // 2. Verifica e decodifica o token
     try {
+        // Usa a JWT_SECRET carregada do .env
         const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded; // Adiciona a informação do usuário à requisição
+        req.user = decoded;
         next();
     } catch (err) {
         console.error('Falha na verificação do JWT:', err.message);
@@ -66,38 +73,28 @@ const authenticateAdmin = (req, res, next) => {
 app.post('/admin/login', async (req, res) => {
     const { username, password } = req.body;
 
-    console.log('\n--- TENTATIVA DE LOGIN ---');
-    console.log(`Usuário Submetido: ${username}`);
-    console.log(`Senha Submetida: ${password}`); // Apenas para debug! Não faça isso em produção.
-    console.log(`Hash Armazenado: ${ADMIN_PASSWORD_HASH}`);
-    console.log('--------------------------');
-
+    // Logs de diagnóstico removidos, pois o login está funcional
     if (username !== ADMIN_USER) {
-        console.log('FALHA: Usuário incorreto.');
         return res.status(401).json({ success: false, message: 'Usuário ou senha inválidos.' });
     }
 
     try {
-        // Compara a senha enviada ('admin123') com o hash armazenado
+        // Usa o ADMIN_PASSWORD_HASH carregado do .env
         const match = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
 
         if (match) {
-            console.log('SUCESSO: Senha correta.');
-            // Gera o JWT e retorna sucesso (restante da lógica...)
             const token = jwt.sign(
                 { id: 1, username: ADMIN_USER },
-                JWT_SECRET,
+                JWT_SECRET, // Usa a JWT_SECRET carregada do .env
                 { expiresIn: '1h' }
             );
             return res.json({ success: true, token: token, message: 'Login realizado com sucesso.' });
         } else {
-            console.log('FALHA: Senha incorreta (bcrypt.compare retornou false).');
             return res.status(401).json({ success: false, message: 'Usuário ou senha inválidos.' });
         }
 
     } catch (error) {
-        // Captura erros no próprio bcrypt (Ex: hash inválido)
-        console.error('ERRO CRÍTICO no bcrypt.compare:', error.message);
+        console.error('ERRO CRÍTICO no login:', error.message);
         return res.status(500).json({ success: false, message: 'Erro interno na validação da senha.' });
     }
 });
@@ -107,7 +104,6 @@ app.post('/admin/login', async (req, res) => {
 // ROTA 2: INSCRIÇÃO (POST /inscricao) - SEM ALTERAÇÕES
 // -------------------------------------------------------------------
 app.post('/inscricao', (req, res) => {
-    // ... (Lógica de Inscrição)
     const { nome, telefone, dataNascimento } = req.body;
 
     if (!nome || !telefone || !dataNascimento) {
@@ -138,7 +134,7 @@ app.post('/inscricao', (req, res) => {
 
 
 // -------------------------------------------------------------------
-// ROTA 3: LISTAGEM DE LEADS (Admin - AGORA PROTEGIDA POR JWT)
+// ROTA 3: LISTAGEM DE LEADS (Admin - PROTEGIDA POR JWT)
 // -------------------------------------------------------------------
 app.get('/admin/leads', authenticateAdmin, (req, res) => {
     const leadsOrdenados = leads.sort((a, b) => b.dataRegistro - a.dataRegistro);
@@ -150,7 +146,7 @@ app.get('/admin/leads', authenticateAdmin, (req, res) => {
 });
 
 // -------------------------------------------------------------------
-// ROTA 4: SORTEIO (Admin - AGORA PROTEGIDA POR JWT)
+// ROTA 4: SORTEIO (Admin - PROTEGIDA POR JWT)
 // -------------------------------------------------------------------
 app.post('/admin/sortear', authenticateAdmin, (req, res) => {
     if (winner) {
@@ -202,5 +198,6 @@ app.get('/sorteio/vencedor', (req, res) => {
 // Inicia o servidor
 app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
-    console.log(`Usuário Admin: ${ADMIN_USER} | Senha: admin123 (para testes)`);
+    console.log(`Acesso Admin: http://localhost:${PORT}/login.html`);
+    console.log(`Resultado do Sorteio: http://localhost:${PORT}/vencedor.html`);
 });
