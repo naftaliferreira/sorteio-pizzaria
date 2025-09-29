@@ -1,4 +1,4 @@
-// src/server.js
+// src/server.js - Versão Final com Agendamento e Segurança .ENV
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -6,9 +6,8 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('./db');
-const dotenv = require('dotenv'); // NOVIDADE: Importa dotenv
+const dotenv = require('dotenv');
 
-// Configura o dotenv para carregar as variáveis do arquivo .env
 dotenv.config();
 
 const app = express();
@@ -17,17 +16,17 @@ const PORT = 3000;
 // -------------------------------------------------------------------
 // VARIÁVEIS DE SEGURANÇA (CARREGADAS DO .ENV)
 // -------------------------------------------------------------------
-
-// As credenciais são carregadas do processo, não estão mais hardcoded
 const JWT_SECRET = process.env.JWT_SECRET;
 const ADMIN_USER = process.env.ADMIN_USER;
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
+const LOTTERY_SCHEDULE_TIME = process.env.LOTTERY_SCHEDULE_TIME; // NOVIDADE: Hora Agendada
 
-// Verificação de segurança: O servidor deve falhar se as chaves estiverem faltando.
-if (!JWT_SECRET || !ADMIN_PASSWORD_HASH || !ADMIN_USER) {
-    console.error("ERRO CRÍTICO: Variáveis de segurança (JWT_SECRET, ADMIN_USER, ADMIN_PASSWORD_HASH) não foram carregadas do arquivo .env. Verifique o arquivo e a instalação do dotenv.");
+// Verificação de segurança:
+if (!JWT_SECRET || !ADMIN_PASSWORD_HASH || !ADMIN_USER || !LOTTERY_SCHEDULE_TIME) {
+    console.error("ERRO CRÍTICO: Variáveis de ambiente faltando! Verifique .env.");
     process.exit(1);
 }
+
 
 // Middleware para processar dados JSON
 app.use(bodyParser.json());
@@ -42,6 +41,8 @@ let leads = db.loadLeads();
 let winner = db.loadWinner();
 
 console.log(`Servidor iniciado. ${leads.length} leads carregados. ${winner ? 'Vencedor carregado.' : 'Sorteio pendente.'}`);
+console.log(`Sorteio agendado para: ${new Date(LOTTERY_SCHEDULE_TIME).toLocaleString('pt-BR')}`);
+
 
 // -------------------------------------------------------------------
 // Middleware de Autenticação (VERIFICA JWT)
@@ -56,12 +57,10 @@ const authenticateAdmin = (req, res, next) => {
     const token = authHeader.split(' ')[1];
 
     try {
-        // Usa a JWT_SECRET carregada do .env
         const decoded = jwt.verify(token, JWT_SECRET);
         req.user = decoded;
         next();
     } catch (err) {
-        console.error('Falha na verificação do JWT:', err.message);
         return res.status(403).json({ success: false, message: 'Token inválido ou expirado.' });
     }
 };
@@ -73,19 +72,17 @@ const authenticateAdmin = (req, res, next) => {
 app.post('/admin/login', async (req, res) => {
     const { username, password } = req.body;
 
-    // Logs de diagnóstico removidos, pois o login está funcional
     if (username !== ADMIN_USER) {
         return res.status(401).json({ success: false, message: 'Usuário ou senha inválidos.' });
     }
 
     try {
-        // Usa o ADMIN_PASSWORD_HASH carregado do .env
         const match = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
 
         if (match) {
             const token = jwt.sign(
                 { id: 1, username: ADMIN_USER },
-                JWT_SECRET, // Usa a JWT_SECRET carregada do .env
+                JWT_SECRET,
                 { expiresIn: '1h' }
             );
             return res.json({ success: true, token: token, message: 'Login realizado com sucesso.' });
@@ -146,9 +143,10 @@ app.get('/admin/leads', authenticateAdmin, (req, res) => {
 });
 
 // -------------------------------------------------------------------
-// ROTA 4: SORTEIO (Admin - PROTEGIDA POR JWT)
+// ROTA 4: SORTEIO (Admin - PROTEGIDA POR JWT E AGENDAMENTO)
 // -------------------------------------------------------------------
 app.post('/admin/sortear', authenticateAdmin, (req, res) => {
+    // 1. Checa se o sorteio já ocorreu
     if (winner) {
         return res.status(400).json({
             success: false,
@@ -157,6 +155,18 @@ app.post('/admin/sortear', authenticateAdmin, (req, res) => {
         });
     }
 
+    // 2. Checa o Agendamento
+    const now = new Date();
+    const scheduledTime = new Date(LOTTERY_SCHEDULE_TIME);
+
+    if (now < scheduledTime) {
+        return res.status(400).json({
+            success: false,
+            message: `O sorteio está agendado para ${scheduledTime.toLocaleString('pt-BR')}. Não pode ser realizado antes.`
+        });
+    }
+
+    // 3. Checa leads
     if (leads.length === 0) {
         return res.status(400).json({
             success: false,
@@ -164,6 +174,7 @@ app.post('/admin/sortear', authenticateAdmin, (req, res) => {
         });
     }
 
+    // Lógica do sorteio...
     const randomIndex = Math.floor(Math.random() * leads.length);
     const selectedWinner = leads[randomIndex];
 
@@ -192,6 +203,15 @@ app.get('/sorteio/vencedor', (req, res) => {
 
     const publicWinnerData = { nome: winner.nome, dataSorteio: winner.dataSorteio };
     res.json({ success: true, message: 'Vencedor encontrado.', winner: publicWinnerData });
+});
+
+// -------------------------------------------------------------------
+// ROTA 6: STATUS GERAL (Pública - Informa agendamento)
+// -------------------------------------------------------------------
+app.get('/sorteio/status', (req, res) => {
+    res.json({
+        scheduledTime: LOTTERY_SCHEDULE_TIME
+    });
 });
 
 
