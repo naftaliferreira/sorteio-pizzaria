@@ -1,16 +1,19 @@
-/* public/style.css */
+/* public/style.css - Versão Final com Paleta de Cores Personalizada */
 
 /* VARIÁVEIS DE CORES */
 :root {
-    --primary-color: #D32F2F;
-    /* Vermelho Pizza */
-    --secondary-color: #FFC107;
-    /* Amarelo Queijo/Ouro */
-    --background-color: #F5F5F5;
-    /* Cinza claro */
+    --primary-color: #D54714;
+    /* Vermelho/Laranja Escuro */
+    --secondary-color: #FFD805;
+    /* Amarelo Ouro Vivo */
+    --contrast-color: #034001;
+    /* Verde Escuro (para sucesso) */
+    --background-color: #F8F8F8;
+    /* Fundo muito claro */
     --text-color: #333;
-    --success-color: #4CAF50;
+    --success-color: var(--contrast-color);
     --error-color: #F44336;
+    /* Vermelho padrão para erros */
     --border-radius: 8px;
 }
 
@@ -28,21 +31,24 @@ header {
     color: white;
     padding: 20px 0;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-bottom: 5px solid var(--secondary-color);
+    /* Adiciona o amarelo para contraste */
 }
 
 header h1 {
     margin: 0;
-    font-size: 2em;
+    font-size: 2.2em;
 }
 
 main {
     max-width: 800px;
     margin: 40px auto;
-    padding: 20px;
+    padding: 30px;
     background: white;
     border-radius: var(--border-radius);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+    border-top: 5px solid var(--secondary-color);
 }
 
 /* ESTILOS DE FORMULÁRIO/CONTROLES */
@@ -66,7 +72,6 @@ input[type="password"] {
     border: 1px solid #ccc;
     border-radius: var(--border-radius);
     box-sizing: border-box;
-    /* Garante que o padding não aumente a largura total */
     font-size: 1em;
 }
 
@@ -80,13 +85,16 @@ button {
     border-radius: var(--border-radius);
     font-size: 1.1em;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.1s;
     font-weight: bold;
+    text-transform: uppercase;
 }
 
 button:hover:not(:disabled) {
-    background-color: #B71C1C;
-    /* Vermelho mais escuro */
+    background-color: #B03B11;
+    /* Tom mais escuro do primário */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 button:disabled {
@@ -102,20 +110,39 @@ button:disabled {
     text-align: center;
     font-weight: bold;
     color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para a Navbar Admin */
+.admin-nav {
+    background-color: #222;
+    /* Fundo escuro para a barra */
+    color: white;
+    padding: 10px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Tabela Admin */
+#leadsTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#leadsTable th,
+#leadsTable td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+    font-size: 0.9em;
+}
+
+#leadsTable th {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: normal;
 }
 
 .hidden {
     display: none;
-}
-
-/* Responsividade Básica */
-@media (max-width: 600px) {
-    main {
-        margin: 20px;
-        padding: 15px;
-    }
-
-    header h1 {
-        font-size: 1.5em;
-    }
 }

@@ -4,78 +4,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Gerenciamento de Sorteio</title>
+    <title>Painel Admin - Sorteio Pizzaria</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Estilos simples para a tabela */
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        #leadsTable {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        #leadsTable th,
-        #leadsTable td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        #leadsTable th {
-            background-color: #f2f2f2;
-        }
-
-        .total-counter {
-            text-align: center;
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-    </style>
 </head>
 
 <body>
-    <h1>Painel de Administração - Leads do Sorteio</h1>
-    <p class="total-counter">Total de Participantes: <span id="leadCount">...</span></p>
+    <header>
+        <h1>🍕 Painel de Administração do Sorteio</h1>
+    </header>
+
+    <div id="navbar-placeholder"></div>
+
+    <main>
+        <h2>Status do Sorteio e Ganhador</h2>
+        <div id="lotteryStatus" style="font-size: 1.2em; margin-bottom: 20px;">Carregando status...</div>
+
+        <button id="performLotteryBtn">Realizar Sorteio</button>
+
+        <div id="winnerDisplay"
+            style="display: none; border: 1px solid #ccc; padding: 15px; margin-top: 20px; border-radius: 8px;">
+            <h3>Ganhador(a)!</h3>
+            <p><strong>Nome:</strong> <span id="winnerName"></span></p>
+            <p><strong>Telefone:</strong> <span id="winnerPhone"></span></p>
+            <p><strong>Data do Sorteio:</strong> <span id="winnerDate"></span></p>
+        </div>
+
+        <hr style="margin: 30px 0;">
+
+        <h2>Lista de Participantes (Leads)</h2>
+        <p>Total de Leads: <strong id="leadCount">0</strong></p>
+
+        <table id="leadsTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>Nascimento</th>
+                    <th>Registro</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="4" style="text-align:center;">Carregando leads...</td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+
+    <script src="admin.js"></script>
+
     <script>
-        // Função para carregar o HTML da Navbar
+        // Função para carregar o HTML da Navbar de forma assíncrona
         fetch('/navbar.html')
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar navbar.html');
+                }
+                return response.text();
+            })
             .then(html => {
                 document.getElementById('navbar-placeholder').innerHTML = html;
 
-                // Adicionar lógica de Logout após o elemento ser carregado
+                // Configura a ação de Logout após o elemento ser injetado no DOM
                 document.getElementById('logoutButton').addEventListener('click', (e) => {
                     e.preventDefault();
                     localStorage.removeItem('adminToken'); // Remove o token
                     window.location.href = '/login.html'; // Redireciona para login
                 });
+            })
+            .catch(error => {
+                console.error("Falha ao injetar a barra de navegação:", error);
             });
     </script>
-    <table id="leadsTable">
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Telefone</th>
-                <th>Data Nasc.</th>
-                <th>Registro</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-
-    <script src="admin.js"></script>
 </body>
 
 </html>
