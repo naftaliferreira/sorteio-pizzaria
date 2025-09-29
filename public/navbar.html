@@ -1,0 +1,38 @@
+<style>
+    /* Estilos da Sidebar/Nav */
+    .admin-nav {
+        background-color: #333;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .admin-nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: flex-start;
+        gap: 20px;
+    }
+
+    .admin-nav a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        transition: color 0.3s;
+    }
+
+    .admin-nav a:hover {
+        color: var(--secondary-color);
+    }
+</style>
+
+<nav class="admin-nav">
+    <ul>
+        <li><a href="/index.html">Página de Cadastro</a></li>
+        <li><a href="/vencedor.html">Ver Vencedor</a></li>
+        <li style="margin-left: auto;"><a href="#" id="logoutButton">Sair (Logout)</a></li>
+    </ul>
+</nav>

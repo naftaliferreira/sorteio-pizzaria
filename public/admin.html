@@ -47,7 +47,21 @@
 <body>
     <h1>Painel de Administração - Leads do Sorteio</h1>
     <p class="total-counter">Total de Participantes: <span id="leadCount">...</span></p>
+    <script>
+        // Função para carregar o HTML da Navbar
+        fetch('/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navbar-placeholder').innerHTML = html;
 
+                // Adicionar lógica de Logout após o elemento ser carregado
+                document.getElementById('logoutButton').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('adminToken'); // Remove o token
+                    window.location.href = '/login.html'; // Redireciona para login
+                });
+            });
+    </script>
     <table id="leadsTable">
         <thead>
             <tr>
